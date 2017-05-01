@@ -8,23 +8,35 @@ var mssql = require('mssql');
 //};
 
 var us_config = {
-	server: 'ussqlserver02.cjfjfx908ewd.us-west-1.rds.amazonaws.com',
-	user: 'wangzhuo',
-	password: 'wangzhuo01!',
-	database: 'AndonCloud'
+	server: '34.210.26.69',
+	//server: 'ussqlserver02.cjfjfx908ewd.us-west-1.rds.amazonaws.com',
+	//user: 'wangzhuo',
+	//password: 'wangzhuo01!',
+	
+	user: 'zouxueliang',
+	password: 'uYBEn0ko',
+	database: 'AndonCloud0527',
+	//database: 'AndonCloud',
+	pool:{
+		max: 10,
+        min:0,
+        idleTimeoutMillis:15000
+    }
 };
 
 exports.selectdb = (svrtype) => {
 	try {
-		var conn = null;
+		console.log('**********mssqlconnect ***********');
+		//mssql.close();
+		var pool = null;
 		switch(svrtype) {
 			case "US":
-				conn = mssql.connect(us_config);
+				pool =new mssql.ConnectionPool(us_config);
 				break;
 		}
-		return conn;
+		return pool;
 	} catch(ex) {
-		mssql.close();
+		//mssql.close();
 		throw(ex);
 	}
 };

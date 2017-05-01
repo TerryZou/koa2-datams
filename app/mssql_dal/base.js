@@ -20,10 +20,6 @@ exports.model = (svrtype) => {
 		}
 	};
 
-	this.connection = () => {
-		return conn.selectdb(svrtype);
-	};
-
 	return this;
 };
 
@@ -34,37 +30,43 @@ function query(svrtype, sql, sqlparam) {
 		console.log("sql: "+sql);
 
 		try {
-			var connection = conn.selectdb(svrtype);
-			if(connection != null) {
-				connection.then(function() {
-					var request = new mssql.Request();
+			var pool = conn.selectdb(svrtype);
+			if(pool != null) {
+				pool.connect(function() {
+					var request = new mssql.Request(pool);
+					console.log("~~~~~~~params~~~~~~~")
 					// 循环加参数
 					for(var p in sqlparam) {
+						console.log(sqlparam[p]);
 						request.input(sqlparam[p].param, sqlparam[p].value);
 					}
+					console.log("~~~~~~~params~~~~~~~~~~`")
 
 					request.query(sql).then(function(result) {
 						console.log("~~~~~~~query success~~~~~~~~~~~`")
+						pool.close();
 						resolve({
 							success: true,
 							status: 1,
 							data: result.recordset,
 							message: "success"
 						});
-						mssql.close();
+						
 					}).catch(function(err) {
 						console.log("~~~~~~~query error~~~~~~~~~~~`")
 						console.log(err);
+						pool.close();
 						resolve({
 							success: false,
 							status: 0,
 							data: null,
 							message: err.message
 						});
-						mssql.close();
+						
 					});
 				});
 			} else {
+				//mssql.close();
 				resolve({
 					success: false,
 					status: 0,

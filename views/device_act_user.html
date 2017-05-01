@@ -104,12 +104,16 @@
 			<div class="layui-row">
 				<div class="layui-col-xs12 layui-col-sm12 layui-col-md12">
 					<table id="demo" lay-filter="datatbl"></table>
+					<div id="datapage"></div>
 				</div>
 			</div>
 		</div>
 		<script type="text/javascript">
 			var sortfield = "UserId";
 			var sorttype = "asc";
+			var page = 1;
+			var row = 10;
+			var pagefirst = true;
 			layui.use('table', function() {
 				var table = layui.table;
 				//执行渲染
@@ -121,9 +125,9 @@
 					//					where: {
 					//
 					//					},
-					page: true,
-					limits: [10, 20, 50],
-					limit: 10, //默认采用60
+					//page: true,
+					//limits: [10, 20, 50],
+					//limit: 10, //默认采用60
 					id: 'UserId',
 					initSort: {
 						field: sortfield, //排序字段，对应 cols 设定的各字段名
@@ -140,8 +144,10 @@
 					//						countName: 'total', //数据总数的字段名称，默认：count
 					//						dataName: 'data' //数据列表的字段名称，默认：data
 					//					},
-					height: 'full-178',
+					height: 'full-240',
 					done: function(res, curr, count) {
+
+						//layer.msg('第'+curr+'页，查询完成');
 
 					},
 					loading: true,
@@ -229,8 +235,9 @@
 			});
 
 			function search() {
-				var param_where=collectparam();
-				if(!param_where.success){
+				pagefirst = false;
+				var param_where = collectparam();
+				if(!param_where.success) {
 					return false;
 				}
 				var msg = layer.msg('加载中', {
@@ -247,14 +254,40 @@
 					},
 					where: param_where.where,
 					done: function(res, curr, count) {
+						//layer.msg('第' + curr + '页，查询完成')
 						layer.close(msg)
+
+						layui.use('laypage', function() {
+							var laypage = layui.laypage;
+
+							//执行一个laypage实例
+							datapage = laypage.render({
+								elem: 'datapage', //注意，这里的 test1 是 ID，不用加 # 号
+								limit: 10,
+								limits: [10, 20, 50],
+								curr:page,
+								count: res.count, //数据总数，从服务端得到
+
+								jump: function(obj, first) {
+									//obj包含了当前分页的所有参数，比如：
+									//console.log(obj.curr); //得到当前页，以便向服务端请求对应页的数据。
+									//console.log(obj.limit); //得到每页显示的条数
+									page = obj.curr;
+									row = obj.limit;
+									//首次不执行
+									if(!first) {
+										search();
+									}
+								}
+							});
+						});
 					}
 				});
 			}
 
-			function exportData(){
-				var param_where=collectparam();
-				if(!param_where.success){
+			function exportData() {
+				var param_where = collectparam();
+				if(!param_where.success) {
 					return false;
 				}
 				var msg = layer.msg('导出数据中', {
@@ -262,7 +295,7 @@
 					shade: 0.01,
 					time: false
 				});
-				
+
 				$.ajax({
 					url: '/api/datams/exportExcel_Activation_User',
 					type: 'POST',
@@ -278,7 +311,7 @@
 					}
 				});
 			}
-			
+
 			function collectparam() {
 				var param_where = {
 					success: false,
@@ -325,7 +358,9 @@
 					'activation': activation,
 					'datatype': datatype,
 					"sortfield": sortfield,
-					"sorttype": sorttype
+					"sorttype": sorttype,
+					"page": page,
+					"row": row
 				};
 				return param_where;
 			}
