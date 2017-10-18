@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+		<title>Title</title>
+
+		<link rel="stylesheet" href="/layui/css/layui.css">
+		<link rel="stylesheet" href="/stylesheets/style.css">
+		<script src="/res/js/jquery-3.2.1.min.js"></script>
+		<script src="/layui/layui.js"></script>
+	</head>
+
+	<body>
+		<div style="width: 100%;height: 40px; position: fixed;top: 0;z-index: 999;">
+			<div class="layui-col-xs12 layui-col-sm12 layui-col-md12">
+				<div style="width: 100%;padding: 10px 0;background: #f2f2f2;border-bottom: 1px solid #e2e2e2;text-indent: 10px;">
+					设备活跃用户信息查询首页
+				</div>
+			</div>
+		</div>
+
+		<div class="layui-container">
+
+			<div class="layui-row" style="margin-top: 50px;">
+				<div class="layui-col-xs12 layui-col-sm12 layui-col-md12">
+					<form class="layui-form">
+						<div class="layui-form-item">
+							<label class="layui-form-label  ms-label">地区</label>
+							<div class="layui-input-inline" style="width: 100px;">
+								<select id="svrtype" lay-filter="svrtype">
+									<option value="">选择地区</option>
+									<option value="CN">CN</option>
+									<option value="US">US</option>
+									<option value="EU">EU</option>
+								</select>
+							</div>
+							<label class="layui-form-label ms-label" style="width: 60px;">数据类型</label>
+							<div class="layui-input-inline" style="width: 130px;">
+								<select id="datatype">
+									<option value="">选择数据类型</option>
+									<option value="BP">血压</option>
+									<option value="BG">血糖</option>
+									<option value="BO">血氧</option>
+									<option value="AMSS">运动</option>
+									<option value="WM">体重</option>
+								</select>
+							</div>
+						</div>
+						<div class="layui-form-item">
+							<label class="layui-form-label ms-label">性别</label>
+							<div class="layui-input-inline" style="width: 70px;">
+								<select id="gender">
+									<option value="">全部</option>
+									<option value="0">未知</option>
+									<option value="1">男</option>
+									<option value="2">女</option>
+								</select>
+							</div>
+							<label class="layui-form-label  ms-label">年龄</label>
+							<div class="layui-input-inline" style="width:70px;">
+								<select id="age_op">
+									<option value="">全部</option>
+									<option value="0">未知</option>
+									<option value=">">大于</option>
+									<option value="<">小于</option>
+									<option value="=">等于</option>
+								</select>
+							</div>
+							<div class="layui-input-inline" style="width: 80px;">
+								<input type="text" id="age" placeholder="输入年龄" autocomplete="off" class="layui-input">
+							</div>
+
+							<label class="layui-form-label  ms-label">国家</label>
+							<div class="layui-form layui-input-inline" lay-filter="usernation" style="width: 100px;">
+								<select id="usernation">
+									<option value="">全部</option>
+									<option value="0">未知</option>
+								</select>
+							</div>
+							<label class="layui-form-label  ms-label" style="width: 50px;">活跃度</label>
+							<div class="layui-input-inline" style="width: 115px;">
+								<select id="activation">
+									<option value="">选择活跃度</option>
+									<option value="1day">1日</option>
+									<option value="1week">1周</option>
+									<option value="1month">1月</option>
+									<option value="3month">3月</option>
+									<option value="6month">6月</option>
+								</select>
+							</div>
+							<div class="layui-input-inline" style="width: 60px;">
+								<input type="button" class="layui-btn" lay-filter="formDemo" value="查询" onclick="search()" />
+							</div>
+							<div class="layui-input-inline" style="width: 60px;">
+								<input type="button" class="layui-btn" class="layui-btn layui-btn-primary" value="导出" onclick="exportData()" />
+							</div>
+						</div>
+
+					</form>
+				</div>
+			</div>
+			<div class="layui-row">
+				<div class="layui-col-xs12 layui-col-sm12 layui-col-md12">
+					<table id="demo" lay-filter="datatbl"></table>
+				</div>
+			</div>
+		</div>
+		<script type="text/javascript">
+			var sortfield = "UserId";
+			var sorttype = "asc";
+			layui.use('table', function() {
+				var table = layui.table;
+				//执行渲染
+				data_tbl = table.render({
+					elem: '#demo',
+					url: '/api/datams/get_Activation_User',
+					//data: userdata,
+					method: 'post',
+					//					where: {
+					//
+					//					},
+					page: true,
+					limits: [10, 20, 50],
+					limit: 10, //默认采用60
+					id: 'UserId',
+					initSort: {
+						field: sortfield, //排序字段，对应 cols 设定的各字段名
+						type: sorttype //排序方式  asc: 升序、desc: 降序、null: 默认排序
+					},
+					request: {
+						pageName: 'page', //页码的参数名称，默认：page
+						limitName: 'row' //每页数据量的参数名，默认：limit
+					},
+					//					response: {
+					//						statusName: 'message', //数据状态的字段名称，默认：code
+					//						statusCode: 200, //成功的状态码，默认：0
+					//						msgName: 'message', //状态信息的字段名称，默认：msg
+					//						countName: 'total', //数据总数的字段名称，默认：count
+					//						dataName: 'data' //数据列表的字段名称，默认：data
+					//					},
+					height: 'full-178',
+					done: function(res, curr, count) {
+
+					},
+					loading: true,
+					even: true, //开启隔行背景
+					cols: [
+						[{
+								field: 'UserName',
+								title: '用户账号',
+								width: 110,
+								sort: true
+							},
+							{
+								field: 'GenderText',
+								title: '性别',
+								width: 110,
+								sort: true
+							},
+							{
+								field: 'Age',
+								title: '年龄',
+								width: 110,
+								sort: true
+							},
+							{
+								field: 'UserRegion',
+								title: '地区',
+								width: 110,
+								sort: true
+							},
+							{
+								field: 'UserNation',
+								title: '国家',
+								width: 110,
+								sort: true
+							},
+							{
+								field: 'CreateTime',
+								title: '注册时间',
+								width: 110,
+								sort: true
+							},
+							{
+								field: 'AppVersion',
+								title: 'App',
+								width: 110,
+								sort: true
+							},
+							{
+								field: 'DeviceName',
+								title: '设备',
+								width: 110,
+								sort: true
+							},
+							{
+								field: 'PhoneName',
+								title: '手机',
+								width: 110,
+								sort: true
+							},
+							{
+								field: 'PhoneOS',
+								title: '手机系统',
+								width: 110,
+								sort: true
+							}
+						]
+					]
+				});
+
+				table.on('sort(datatbl)', function(obj) {
+					sortfield = obj.field;
+					sorttype = obj.type;
+					search();
+				});
+			});
+
+			layui.use('form', function() {
+				var form = layui.form;
+
+				form.on('select(svrtype)', function(data) {
+					getNations(data.value, function() {
+						form.render('select', 'usernation');
+					});
+				});
+			});
+
+			function search() {
+				var param_where=collectparam();
+				if(!param_where.success){
+					return false;
+				}
+				var msg = layer.msg('加载中', {
+					icon: 16,
+					shade: 0.01,
+					time: false
+				});
+
+				//这里以搜索为例
+				data_tbl.reload({
+					initSort: {
+						field: sortfield, //排序字段，对应 cols 设定的各字段名
+						type: sorttype //排序方式  asc: 升序、desc: 降序、null: 默认排序
+					},
+					where: param_where.where,
+					done: function(res, curr, count) {
+						layer.close(msg)
+					}
+				});
+			}
+
+			function exportData(){
+				var param_where=collectparam();
+				if(!param_where.success){
+					return false;
+				}
+				var msg = layer.msg('导出数据中', {
+					icon: 16,
+					shade: 0.01,
+					time: false
+				});
+				
+				$.ajax({
+					url: '/api/datams/exportExcel_Activation_User',
+					type: 'POST',
+					data: param_where.where,
+					success: function(data) {
+						if(data.success) {
+							window.open(data.data);
+						}
+						layer.close(msg)
+					},
+					error: function(ex) {
+						layer.close(msg)
+					}
+				});
+			}
+			
+			function collectparam() {
+				var param_where = {
+					success: false,
+					where: {}
+				};
+				var svrtype = $("#svrtype").val();
+				if(svrtype == undefined || svrtype == null || svrtype == '') {
+					layer.msg('请选择地区');
+					return param_where;
+				}
+				var datatype = $("#datatype").val();
+				if(datatype == undefined || datatype == null || datatype == '') {
+					layer.msg('请选择数据类型');
+					return param_where;;
+				}
+				var activation = $("#activation").val();
+				if(activation == undefined || activation == null || activation == '') {
+					layer.msg('请选择活跃度');
+					return param_where;
+				}
+				var age_op = $("#age_op").val();
+				var age = $.trim($("#age").val());
+				if(age_op != undefined && age_op != null && age_op != '0' && age_op != '') {
+					if(age == undefined || age == null || age == '') {
+						layer.msg('请输入年龄');
+						return param_where;
+					} else {
+						var re = /^[0-9]+$/;
+						if(!re.test(age)) {
+							layer.msg('输入的年龄格式不正确，请输入大于等于 0 的整数');
+							return param_where;
+						}
+					}
+				}
+				var gender = $("#gender").val();
+				var usernation = $("#usernation").val();
+				param_where.success = true;
+				param_where.where = {
+					'gender': gender,
+					'age': age,
+					'age_op': age_op,
+					'svrtype': svrtype,
+					'usernation': usernation,
+					'activation': activation,
+					'datatype': datatype,
+					"sortfield": sortfield,
+					"sorttype": sorttype
+				};
+				return param_where;
+			}
+
+			function getNations(svrtype, f) {
+				var html = '<option value="">全部</option><option value="0">未知</option>';
+				if(svrtype != "") {
+					$.ajax({
+						type: "POST",
+						url: "/api/usercenter/getNations",
+						data: {
+							'svrtype': svrtype
+						},
+						success: function(data) {
+
+							try {
+								if(data.success) {
+
+									if(data.total > 0) {
+										for(var i = 0; i < data.total; i++) {
+											html += '<option value="' + data.data[i].UserNation + '">' + data.data[i].UserNation + '</option>';
+										}
+									}
+									$("#usernation").html(html);
+									if(f != null) {
+										f();
+									}
+								}
+							} catch(e) {
+								alert("操作超时，请重新操作或联系管理员！");
+							}
+						}
+					});
+				} else {
+					$("#usernation").html(html);
+				}
+			}
+		</script>
+	</body>
+
+</html>
