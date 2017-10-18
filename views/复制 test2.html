@@ -1,310 +1,72 @@
-<!DOCTYPE html>
-<html lang="en">
-
-	<head>
-		<meta charset="UTF-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-		<title>Title</title>
-		<script src="/res/js/jquery-3.2.1.min.js"></script>
-		<link rel="stylesheet" href="/layui/css/layui.css">
-		<script src="/layui/layui.js"></script>
-	</head>
-
-	<body>
-		<div class="layui-row">
-			<div class="layui-col-xs12 layui-col-sm12 layui-col-md12">
-				<div style="width: 100%;padding: 10px 0;background: #f2f2f2;border-bottom: 1px solid #e2e2e2;text-indent: 10px;">
-				设备活跃用户信息查询首页
-				</div>
-		    </div>
-		</div>
-
-		<div class="layui-container">
-			
-			<div class="layui-row" style="margin-top: 15px;">
-				<div class="layui-col-xs12 layui-col-sm12 layui-col-md12">
-					<form class="layui-form">
-						<div class="layui-form-item">
-							<div class="layui-inline">
-								<label class="layui-form-label">性别</label>
-								<div class="layui-input-block" style="width: 100px;">
-									<select id="gender">
-										<option value="">全部</option>
-										<option value="0">未知</option>
-										<option value="1">男</option>
-										<option value="2">女</option>
-									</select>
-								</div>
-							</div>
-							<div class="layui-inline">
-								<label class="layui-form-label">年龄</label>
-								<div class="layui-input-inline" style="width: 60px;">
-									<select id="age_op">
-										<option value=">"> > </option>
-										<option value="<">
-											< </option>
-												<option value="="> = </option>
-									</select>
-								</div>
-								<div class="layui-input-inline" style="width: 100px;">
-									<input type="text" id="age" placeholder="输入年龄" autocomplete="off" class="layui-input">
-								</div>
-							</div>
-							<div class="layui-inline">
-								<label class="layui-form-label">地区</label>
-								<div class="layui-input-block" style="width: 100px;">
-									<select id="svrtype" lay-filter="svrtype">
-										<option value="">选择地区</option>
-										<option value="CN">CN</option>
-										<option value="US">CN</option>
-										<option value="EU">EU</option>
-									</select>
-								</div>
-							</div>
-							<div class="layui-inline">
-								<label class="layui-form-label">国家</label>
-								<div class="layui-form layui-input-block" lay-filter="usernation" style="width: 100px;">
-									<select id="usernation">
-										<option value="">选择国家</option>
-									</select>
-								</div>
-							</div>
-							<div class="layui-inline">
-								<label class="layui-form-label">活跃度</label>
-								<div class="layui-input-block" style="width: 100px;">
-									<select id="activation">
-										<option value="">选择活跃度</option>
-										<option value="1day">1日</option>
-										<option value="1week">1周</option>
-										<option value="1month">1月</option>
-										<option value="3month">3月</option>
-										<option value="6month">6月</option>
-									</select>
-								</div>
-							</div>
-							<div class="layui-inline">
-								<label class="layui-form-label">数据类型</label>
-								<div class="layui-input-block">
-									<select id="datatype">
-										<option value=""> 选择数据类型</option>
-										<option value="0">血压</option>
-										<option value="1">血糖</option>
-										<option value="2">血氧</option>
-										<option value="3">运动</option>
-										<option value="4">体重</option>
-									</select>
-								</div>
-							</div>
-							<div class="layui-inline">
-								<input type="button" class="layui-btn" lay-filter="formDemo" value="查询" onclick="search()" />
-								<input type="button" class="layui-btn" class="layui-btn layui-btn-primary" value="导出" />
-							</div>
-						</div>
-
-					</form>
-				</div>
-			</div>
-			<div class="layui-row">
-				<div class="layui-col-xs12 layui-col-sm12 layui-col-md12">
-					<table id="demo" lay-filter="datatbl"></table>
-				</div>
-			</div>
-		</div>
-		<script type="text/html" id="gendertpl">
-			{{# if(d.Gender==1){ }} 男 {{# } else if(d.Gender==2){ }} 女 {{# } else{}} 未知 {{# } }}
-		</script>
-		<script type="text/javascript">
-			var sortfield = "UserId";
-			var sorttype = "asc";
-			layui.use('table', function() {
-				var table = layui.table;
-				//执行渲染
-				data_tbl = table.render({
-					elem: '#demo',
-					url: '/api/datams/get_BGActivation_User',
-					//data: userdata,
-					method: 'post',
-					where: {
-
-					},
-					page: true,
-					limits: [10, 20, 50],
-					limit: 10, //默认采用60
-					id: 'UserId',
-					initSort: {
-						field: sortfield, //排序字段，对应 cols 设定的各字段名
-						type: sorttype //排序方式  asc: 升序、desc: 降序、null: 默认排序
-					},
-					request: {
-						pageName: 'page', //页码的参数名称，默认：page
-						limitName: 'row' //每页数据量的参数名，默认：limit
-					},
-					//					response: {
-					//						statusName: 'message', //数据状态的字段名称，默认：code
-					//						statusCode: 200, //成功的状态码，默认：0
-					//						msgName: 'message', //状态信息的字段名称，默认：msg
-					//						countName: 'total', //数据总数的字段名称，默认：count
-					//						dataName: 'data' //数据列表的字段名称，默认：data
-					//					},
-					height: 'full',
-					done: function(res, curr, count) {
-						//如果是异步请求数据方式，res即为你接口返回的信息。
-						//如果是直接赋值的方式，res即为：{data: [], count: 99} data为当前页数据、count为数据总长度
-						console.log(res);
-						//得到当前页码
-						console.log(curr);
-						//得到数据总量
-						console.log(count);
-					},
-					loading: true,
-					even: true, //开启隔行背景
-					cols: [
-						[{
-								field: 'UserName',
-								title: '用户账号',
-								width: 110,
-								sort: true
-							},
-							{
-								field: 'Gender',
-								title: '性别',
-								width: 110,
-								sort: true,
-								templet: '#gendertpl'
-							},
-							{
-								field: 'Age',
-								title: '年龄',
-								width: 110,
-								sort: true
-							},
-							{
-								field: 'UserRegion',
-								title: '地区',
-								width: 110,
-								sort: true
-							},
-							{
-								field: 'UserNation',
-								title: '国家',
-								width: 110,
-								sort: true
-							},
-							{
-								field: 'CreateTime',
-								title: '注册时间',
-								width: 110,
-								sort: true
-							},
-							{
-								field: 'AppVersion',
-								title: 'App',
-								width: 110,
-								sort: true
-							},
-							{
-								field: 'DeviceName',
-								title: '设备',
-								width: 110,
-								sort: true
-							},
-							{
-								field: 'PhoneName',
-								title: '手机',
-								width: 110,
-								sort: true
-							},
-							{
-								field: 'PhoneOS',
-								title: '手机系统',
-								width: 110,
-								sort: true
-							}
-						]
-					]
-				});
-
-				table.on('sort(datatbl)', function(obj) {
-					sortfield = obj.field;
-					sorttype = obj.type;
-					search();
-				});
-			});
-
-			layui.use('form', function() {
-				var form = layui.form;
-
-				form.on('select(svrtype)', function(data) {
-					getNations(data.value, function() {
-						form.render('select', 'usernation');
-					});
-				});
-			});
-
-			function search() {
-				var gender = $("#gender").val();
-				var age = $("#age").val();
-				var age_op = $("#age_op").val();
-				var svrtype = $("#svrtype").val();
-				var usernation = $("#usernation").val();
-				var activation = $("#activation").val();
-				var datatype = $("#datatype").val();
-				console.log(sortfield);
-				console.log(sorttype);
-				//这里以搜索为例
-				data_tbl.reload({
-					initSort: {
-						field: sortfield, //排序字段，对应 cols 设定的各字段名
-						type: sorttype //排序方式  asc: 升序、desc: 降序、null: 默认排序
-					},
-					where: {
-						'gender': gender,
-						'age': age,
-						'age_op': age_op,
-						'svrtype': svrtype,
-						'usernation': usernation,
-						'activation': activation,
-						'datatype': datatype,
-						"sortfield": sortfield,
-						"sorttype": sorttype
-					}
-				});
-			}
-
-			function getNations(svrtype, f) {
-				var html = '<option value="">请选择国家</option>';
-				if(svrtype != "") {
-					$.ajax({
-						type: "POST",
-						url: "/api/usercenter/getNations",
-						data: {
-							'svrtype': svrtype
-						},
-						success: function(data) {
-
-							try {
-								if(data.success) {
-
-									if(data.total > 0) {
-										for(var i = 0; i < data.total; i++) {
-											html += '<option value="' + data.data[i].UserNation + '">' + data.data[i].UserNation + '</option>';
-										}
-									}
-									$("#usernation").html(html);
-									if(f != null) {
-										f();
-									}
-								}
-							} catch(e) {
-								alert("操作超时，请重新操作或联系管理员！");
-							}
-						}
-					});
-				} else {
-					$("#usernation").html(html);
-				}
-			}
-		</script>
-	</body>
-
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <title>Title</title>
+  <meta name="Generator" content="Cocoa HTML Writer">
+  <meta name="CocoaVersion" content="1504.83">
+  <style type="text/css">
+    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; line-height: 14.0px; font: 12.0px 'Songti SC'; color: #000000; -webkit-text-stroke: #000000}
+    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; line-height: 17.0px; font: 12.0px 'Songti SC'; color: #000000; -webkit-text-stroke: #000000}
+    p.p3 {margin: 0.0px 0.0px 0.0px 0.0px; line-height: 13.0px; font: 11.0px 'Helvetica Neue'; color: #000000; -webkit-text-stroke: #000000; background-color: #ffffff}
+    p.p4 {margin: 0.0px 0.0px 0.0px 0.0px; line-height: 13.0px; font: 11.0px 'Helvetica Neue'; color: #000000; -webkit-text-stroke: #000000; min-height: 13.0px}
+    p.p5 {margin: 0.0px 0.0px 0.0px 0.0px; line-height: 13.0px; font: 11.0px 'Helvetica Neue'; color: #000000; -webkit-text-stroke: #000000; background-color: #ffffff; min-height: 13.0px}
+    p.p6 {margin: 0.0px 0.0px 0.0px 0.0px; line-height: 13.0px; font: 11.0px Times; color: #000000; -webkit-text-stroke: #000000; background-color: #ffffff}
+    p.p7 {margin: 0.0px 0.0px 0.0px 0.0px; line-height: 14.0px; font: 12.0px Times; color: #000000; -webkit-text-stroke: #000000}
+    span.s1 {font-kerning: none; background-color: #f2f2f2}
+    span.s2 {font: 12.0px Times; font-kerning: none; background-color: #f2f2f2}
+    span.s3 {font-kerning: none}
+    span.s4 {font: 11.0px 'Songti SC'; font-kerning: none}
+    span.s5 {font-kerning: none; background-color: #ffffff}
+    span.s6 {font: 11.0px Times; font-kerning: none}
+    span.Apple-tab-span {white-space:pre}
+  </style>
+</head>
+<body>
+<p class="p1"><span class="s1">设备活跃用户信息查询首页</span><span class="s2"><span class="Apple-converted-space"> </span></span></p>
+<p class="p2"><span class="s3">性别</span></p>
+<p class="p3"><span class="s3"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span></span><span class="s4">全部</span></p>
+<p class="p3"><span class="s3"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span></span><span class="s4">未知</span></p>
+<p class="p3"><span class="s3"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span></span><span class="s4">男</span></p>
+<p class="p3"><span class="s3"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span></span><span class="s4">女</span></p>
+<p class="p4"><span class="s5"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span></span></p>
+<p class="p2"><span class="s3">年龄</span></p>
+<p class="p3"><span class="s3"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span></span><span class="s6">&gt;<span class="Apple-converted-space"> </span></span></p>
+<p class="p5"><span class="s3"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span></span></p>
+<p class="p6"><span class="s3"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>&lt;<span class="Apple-converted-space"> </span></span></p>
+<p class="p3"><span class="s3"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span></span><span class="s6">=<span class="Apple-converted-space"> </span></span></p>
+<p class="p4"><span class="s5"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span></span></p>
+<p class="p7"><span class="s3"><br>
+</span></p>
+<p class="p2"><span class="s3">地区</span></p>
+<p class="p3"><span class="s3"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span></span><span class="s4">选择地区</span></p>
+<p class="p3"><span class="s3"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span></span><span class="s6">CN</span></p>
+<p class="p3"><span class="s3"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span></span><span class="s6">CN</span></p>
+<p class="p3"><span class="s3"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span></span><span class="s6">EU</span></p>
+<p class="p4"><span class="s5"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span></span></p>
+<p class="p2"><span class="s3">国家</span></p>
+<p class="p3"><span class="s3"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span></span><span class="s4">选择国家</span></p>
+<p class="p4"><span class="s5"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span></span></p>
+<p class="p2"><span class="s3">活跃度</span></p>
+<p class="p3"><span class="s3"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span></span><span class="s4">选择活跃度</span></p>
+<p class="p3"><span class="s3"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span></span><span class="s6">1</span><span class="s4">日</span></p>
+<p class="p3"><span class="s3"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span></span><span class="s6">1</span><span class="s4">周</span></p>
+<p class="p3"><span class="s3"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span></span><span class="s6">1</span><span class="s4">月</span></p>
+<p class="p3"><span class="s3"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span></span><span class="s6">3</span><span class="s4">月</span></p>
+<p class="p3"><span class="s3"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span></span><span class="s6">6</span><span class="s4">月</span></p>
+<p class="p4"><span class="s5"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span></span></p>
+<p class="p2"><span class="s3">数据类型</span></p>
+<p class="p3"><span class="s3"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span></span><span class="s4">选择数据类型</span></p>
+<p class="p3"><span class="s3"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span></span><span class="s4">血压</span></p>
+<p class="p3"><span class="s3"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span></span><span class="s4">血糖</span></p>
+<p class="p3"><span class="s3"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span></span><span class="s4">血氧</span></p>
+<p class="p3"><span class="s3"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span></span><span class="s4">运动</span></p>
+<p class="p3"><span class="s3"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span></span><span class="s4">体重</span></p>
+<p class="p4"><span class="s5"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span></span></p>
+<p class="p7"><span class="s3"><br>
+</span></p>
+<p class="p7"><span class="s3"><br>
+</span></p>
+</body>
 </html>
