@@ -91,7 +91,7 @@
 								</select>
 							</div>
 							<div class="layui-input-inline" style="width: 60px;">
-								<input type="button" class="layui-btn" lay-filter="formDemo" value="查询" onclick="search()" />
+								<input type="button" class="layui-btn" lay-filter="formDemo" value="查询" onclick="btnsearch()" />
 							</div>
 							<div class="layui-input-inline" style="width: 60px;">
 								<input type="button" class="layui-btn" class="layui-btn layui-btn-primary" value="导出" onclick="exportData()" />
@@ -220,6 +220,7 @@
 				table.on('sort(datatbl)', function(obj) {
 					sortfield = obj.field;
 					sorttype = obj.type;
+					page = 1;
 					search();
 				});
 			});
@@ -233,6 +234,11 @@
 					});
 				});
 			});
+
+			function btnsearch() {
+				page = 1;
+				search();
+			}
 
 			function search() {
 				pagefirst = false;
@@ -265,9 +271,9 @@
 								elem: 'datapage', //注意，这里的 test1 是 ID，不用加 # 号
 								limit: 10,
 								limits: [10, 20, 50],
-								curr:page,
+								curr: page,
 								count: res.count, //数据总数，从服务端得到
-
+								layout: ['prev', 'page', 'next', 'skip', 'count', 'limit'],
 								jump: function(obj, first) {
 									//obj包含了当前分页的所有参数，比如：
 									//console.log(obj.curr); //得到当前页，以便向服务端请求对应页的数据。

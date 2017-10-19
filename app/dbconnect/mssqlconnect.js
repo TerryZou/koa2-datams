@@ -8,15 +8,15 @@ var mssql = require('mssql');
 //};
 
 var us_config = {
-	server: '34.210.26.69',
-	//server: 'ussqlserver02.cjfjfx908ewd.us-west-1.rds.amazonaws.com',
+	//server: '34.210.26.69',
+	server: 'ussqlserver02.cjfjfx908ewd.us-west-1.rds.amazonaws.com',
 	//user: 'wangzhuo',
 	//password: 'wangzhuo01!',
 	
 	user: 'zouxueliang',
 	password: 'uYBEn0ko',
-	database: 'AndonCloud0527',
-	//database: 'AndonCloud',
+	//database: 'AndonCloud0527',
+	database: 'AndonCloud',
 	pool:{
 		max: 10,
         min:0,
