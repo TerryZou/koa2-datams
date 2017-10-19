@@ -21,6 +21,7 @@
 					<li class="layui-nav-item">
 						<a href="">查询</a>
 					</li>
+
 					<!--<li class="layui-nav-item">
         <a href="javascript:;">其它系统</a>
         <dl class="layui-nav-child">
@@ -29,6 +30,12 @@
           <dd><a href="">授权管理</a></dd>
         </dl>
       </li>-->
+				</ul>
+				<ul class="layui-nav">
+					<li class="layui-nav-item" style="float: right">
+						<input type="button" class="layui-btn" class="layui-btn layui-btn-primary" value="退出" onclick="logout()" />
+
+					</li>
 				</ul>
 				<!--<ul class="layui-nav layui-layout-right">
 					<li class="layui-nav-item">
@@ -106,6 +113,25 @@
 			});
 			
 			$("#ms_frame").height(($(window).height()-108));
+
+			function logout() {
+				$.ajax({
+					url: '/api/login/logout_User',
+					type: 'post',
+					data: {logout:true},
+					success: function(data) {
+						if(data.success) {
+							window.location.href="/login";
+						}else{
+							layer.msg('未退出');
+						}
+						layer.close(msg)
+					},
+					error: function(ex) {
+						layer.close(msg)
+					}
+				});
+			}
 		</script>
 	</body>
 

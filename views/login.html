@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+		<title>数据中心后台登陆</title>
+		<link rel="stylesheet" href="/layui/css/layui.css">
+		<script src="/res/js/jquery-3.2.1.min.js"></script>
+		<script src="/layui/layui.js" charset="utf-8"></script>
+	</head>
+
+	<body>
+		<div class="layui-layout layui-layout-admin " style="padding-bottom: 44px;width: 310px;position: absolute;top: 50%;left: 50%;margin-left: -155px;margin-top: -94px;">
+			<form method="post" class="layui-form layui-form-pane">
+				<div class="layui-form-item">
+				<b>	iHealth 数据中心</b>
+				</div>
+
+				<div class="layui-form-item">
+					<label class="layui-form-label">用户名</label>
+					<div class="layui-input-inline">
+						<input type="text" name="username" lay-verify="required" placeholder="请输入用户名" autocomplete="off" class="layui-input" id="userName">
+					</div>
+				</div>
+
+
+				<div class="layui-form-item">
+					<label class="layui-form-label">密码</label>
+					<div class="layui-input-inline">
+						<input type="password" name="password" lay-verify="required" placeholder="请输入密码" autocomplete="off" class="layui-input" id="userPwd">
+					</div>
+					<!--<div class="layui-form-mid layui-word-aux">请务必填写用户名</div>-->
+				</div>
+
+
+				<div class="layui-form-item">
+					<!--<button class="layui-btn" lay-submit="" lay-filter="demo2" onclick="search()">login</button>-->
+					<input type="button" class="layui-btn" class="layui-btn layui-btn-primary" value="login" onclick="search()" />
+
+				</div>
+			</form>
+
+
+			<!-- 注意：如果你直接复制所有代码到本地，上述js路径需要改成你本地的 -->
+			<script>
+				layui.use(['form', 'layedit', 'laydate'], function(){
+					var form = layui.form
+							,layer = layui.layer
+							,layedit = layui.layedit
+							,laydate = layui.laydate;
+				});
+
+				function search() {
+					var userName = $("#userName").val();
+					var userPwd = $("#userPwd").val();
+					if(userName == undefined || userName == null || userName == '') {
+						layer.msg('请输入用户名');
+					}else if(userPwd == undefined || userPwd == null || userPwd == '') {
+						layer.msg('请输入密码');
+					}else {
+						var user={
+							userName: userName,
+							userPwd: userPwd
+						};
+						var msg = layer.msg('登陆中', {
+							icon: 16,
+							shade: 0.01,
+							time: false
+						});
+
+						$.ajax({
+							url: '/api/login/get_User',
+							type: 'post',
+							data: user,
+							success: function(data) {
+								if(data.success) {
+									window.location.href="/";
+								}else{
+									layer.msg('账号错误');
+								}
+								layer.close(msg)
+							},
+							error: function(ex) {
+								layer.close(msg)
+							}
+						});
+					}
+
+				}
+
+			</script>
+
+
+			<div class="layui-footer" style="left: 0;text-align: center;">
+				<!-- 底部固定区域 -->
+				© 2017 iHealth 数据中心
+			</div>
+		</div>
+		<script src="/layui/layui.js"></script>
+
+	</body>
+
+</html>

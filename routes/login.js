@@ -1,9 +1,9 @@
 const router = require('koa-router')()
-const session = require("koa-session2")
 
-router.get('/', async (ctx, next) => {
+// router.prefix('/login')
+router.get('/login', async (ctx, next) => {
   try{
-    if(ctx.session.user != 'null' && ctx.session.user == 'line-height'){
+    if(ctx.session.user != 'null' && ctx.session.user == '111'){
       await ctx.render('index', {
         title: 'Hello Koa 2!'
       })
