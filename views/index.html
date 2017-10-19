@@ -31,10 +31,10 @@
         </dl>
       </li>-->
 				</ul>
-				<ul class="layui-nav">
-					<li class="layui-nav-item" style="float: right">
-						<input type="button" class="layui-btn" class="layui-btn layui-btn-primary" value="退出" onclick="logout()" />
-
+				<ul class="layui-nav layui-layout-right">
+					<li class="layui-nav-item">
+						<!--<input type="button" class="layui-btn" class="layui-btn layui-btn-primary" value="退出" onclick="logout()" />-->
+						<a href="" onclick="logout()">退了</a>
 					</li>
 				</ul>
 				<!--<ul class="layui-nav layui-layout-right">
@@ -111,18 +111,20 @@
 				var element = layui.element;
 
 			});
-			
-			$("#ms_frame").height(($(window).height()-108));
+
+			$("#ms_frame").height(($(window).height() - 108));
 
 			function logout() {
 				$.ajax({
 					url: '/api/login/logout_User',
 					type: 'post',
-					data: {logout:true},
+					data: {
+						logout: true
+					},
 					success: function(data) {
 						if(data.success) {
-							window.location.href="/login";
-						}else{
+							window.location.href = "/login";
+						} else {
 							layer.msg('未退出');
 						}
 						layer.close(msg)
