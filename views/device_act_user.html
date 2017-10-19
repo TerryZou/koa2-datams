@@ -269,7 +269,7 @@
 							//执行一个laypage实例
 							datapage = laypage.render({
 								elem: 'datapage', //注意，这里的 test1 是 ID，不用加 # 号
-								limit: 10,
+								limit: row,
 								limits: [10, 20, 50],
 								curr: page,
 								count: res.count, //数据总数，从服务端得到
@@ -280,6 +280,7 @@
 									//console.log(obj.limit); //得到每页显示的条数
 									page = obj.curr;
 									row = obj.limit;
+									console.log(obj.limit);
 									//首次不执行
 									if(!first) {
 										search();
